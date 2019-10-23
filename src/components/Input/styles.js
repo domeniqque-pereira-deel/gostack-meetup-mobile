@@ -7,6 +7,8 @@ export const Container = styled.View`
   border-radius: 4px;
   flex-direction: row;
   align-items: center;
+  border-bottom-width: 2;
+  border-bottom-color: ${props => (props.hasError ? '#f94d6a' : 'transparent')};
 `;
 
 export const TInput = styled.TextInput.attrs({
@@ -16,4 +18,10 @@ export const TInput = styled.TextInput.attrs({
   font-size: 15px;
   margin-left: 10px;
   color: #fff;
+`;
+
+export const Error = styled.Text`
+  font-size: 14px;
+  color: #f94d6a;
+  padding: 0 0 15px;
 `;

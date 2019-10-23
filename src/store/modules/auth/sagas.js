@@ -16,7 +16,7 @@ export function* signUp({ payload }) {
       passwordConfirmation,
     });
 
-    Alert.alert('Cadastro finalizado!', 'Cadastro efetuado com sucesso!');
+    Alert.alert('Cadastro finalizado', 'Cadastro efetuado com sucesso!');
 
     // history.push('/');
   } catch (err) {

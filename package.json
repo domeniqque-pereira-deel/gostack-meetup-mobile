@@ -11,6 +11,7 @@
     "postinstall": "jetify"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.6.2",
     "axios": "^0.19.0",
     "eslint-plugin-import-helpers": "^1.0.2",
     "immer": "^4.0.2",
@@ -30,7 +31,8 @@
     "redux": "^4.0.4",
     "redux-persist": "^6.0.0",
     "redux-saga": "^1.1.1",
-    "styled-components": "^4.4.0"
+    "styled-components": "^4.4.0",
+    "yup": "^0.27.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
