@@ -1,43 +1,54 @@
-import PropTypes from 'prop-types';
 import React, { useState, useRef } from 'react';
-import { Image } from 'react-native';
-import { useDispatch } from 'react-redux';
+// import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 
-import logo from '~/assets/logo.png';
 import Background from '~/components/Background';
-import { signUpRequest } from '~/store/modules/auth/actions';
+import { signOut } from '~/store/modules/auth/actions';
+import { updateProfileRequest } from '~/store/modules/user/actions';
 
 import {
   Container,
   Form,
   FormInput,
   SubmitButton,
-  SignLink,
-  SignLinkText,
+  LogoutButton,
+  Divisor,
 } from './styles';
 
 const schema = Yup.object().shape({
   name: Yup.string().required('O nome é obrigatório'),
-  email: Yup.string()
-    .email('Informe seu email')
-    .required('O email é obrigatório'),
-  password: Yup.string()
-    .min(6, 'A senha deve ter pelo menos 6 dígitos')
-    .required('A senha é obrigatória'),
-  passwordConfirmation: Yup.string().oneOf(
-    [Yup.ref('password')],
-    'As senhas não correspondem'
+  email: Yup.string().required('O email é obrigatório'),
+  oldPassword: Yup.string(),
+  password: Yup.string().when('oldPassword', (oldPassword, field) =>
+    oldPassword
+      ? field
+          .min(6, 'A senha deve ter no mínimo 6 dígitos')
+          .required('Informe a nova senha')
+      : field
+  ),
+  passwordConfirmation: Yup.string().when('password', (password, field) =>
+    password
+      ? field
+          .required('Confirme sua senha')
+          .oneOf(
+            [Yup.ref('password')],
+            'A confirmação de senha não corresponde'
+          )
+      : field
   ),
 });
 
-export default function SignUp({ navigation }) {
+export default function Profile() {
+  const profile = useSelector(state => state.user.profile);
   const emailRef = useRef();
   const passwordRef = useRef();
+  const oldPasswordRef = useRef();
   const passwordConfirmationRef = useRef();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState(profile.name);
+  const [email, setEmail] = useState(profile.email);
+  const [oldPassword, setOldPassword] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
@@ -47,11 +58,15 @@ export default function SignUp({ navigation }) {
 
   async function handleSubmit() {
     try {
-      const data = { name, email, password, passwordConfirmation };
+      const data = { name, email, oldPassword, password, passwordConfirmation };
 
       await schema.validate(data, { abortEarly: false, stripUnknown: true });
+
       setErrors({});
-      dispatch(signUpRequest(data));
+      dispatch(updateProfileRequest(data));
+      setOldPassword('');
+      setPassword('');
+      setPasswordConfirmation('');
     } catch (err) {
       if (!err.inner) {
         throw err;
@@ -66,11 +81,13 @@ export default function SignUp({ navigation }) {
     }
   }
 
+  function handleLogout() {
+    dispatch(signOut());
+  }
+
   return (
     <Background>
       <Container>
-        <Image source={logo} />
-
         <Form>
           <FormInput
             autoCorrect={false}
@@ -90,26 +107,39 @@ export default function SignUp({ navigation }) {
             placeholder="Digite seu e-mail"
             ref={emailRef}
             returnKeyType="next"
-            onSubmitEditing={() => passwordRef.current.focus()}
+            onSubmitEditing={() => oldPasswordRef.current.focus()}
             value={email}
             onChangeText={setEmail}
             error={errors.email}
           />
 
+          <Divisor />
+
           <FormInput
             secureTextEntry
-            placeholder="Sua senha secreta"
-            ref={passwordRef}
+            placeholder="Senha atual"
+            ref={oldPasswordRef}
             returnKeyType="next"
-            onSubmitEditing={() => passwordConfirmationRef.current.focus()}
+            onSubmitEditing={() => passwordRef.current.focus()}
+            value={oldPassword}
+            onChangeText={setOldPassword}
+            error={errors.oldPassword}
+          />
+
+          <FormInput
+            secureTextEntry
+            placeholder="Nova senha"
+            ref={passwordRef}
+            returnKeyType="send"
             value={password}
             onChangeText={setPassword}
+            onSubmitEditing={() => passwordConfirmationRef.current.focus()}
             error={errors.password}
           />
 
           <FormInput
             secureTextEntry
-            placeholder="Repita a senha"
+            placeholder="Confirmação de senha"
             ref={passwordConfirmationRef}
             returnKeyType="send"
             onSubmitEditing={handleSubmit}
@@ -118,19 +148,11 @@ export default function SignUp({ navigation }) {
             error={errors.passwordConfirmation}
           />
 
-          <SubmitButton onPress={handleSubmit}>Criar conta</SubmitButton>
-        </Form>
+          <SubmitButton onPress={handleSubmit}>Salvar perfil</SubmitButton>
 
-        <SignLink onPress={() => navigation.navigate('SignIn')}>
-          <SignLinkText>Já tenho conta</SignLinkText>
-        </SignLink>
+          <LogoutButton onPress={handleLogout}>Sair do MeetApp</LogoutButton>
+        </Form>
       </Container>
     </Background>
   );
 }
-
-SignUp.propTypes = {
-  navigation: PropTypes.shape({
-    navigate: PropTypes.func,
-  }).isRequired,
-};

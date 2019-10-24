@@ -35,12 +35,13 @@ export default function SignIn({ navigation }) {
 
   async function handleSubmit() {
     try {
-      const data = { email, password };
-
-      await schema.validate(data, { abortEarly: false, stripUnknown: true });
+      await schema.validate(
+        { email, password },
+        { abortEarly: false, stripUnknown: true }
+      );
 
       setErrors({});
-      dispatch(signInRequest(...data));
+      dispatch(signInRequest(email, password));
     } catch (err) {
       if (!err.inner) {
         throw err;
