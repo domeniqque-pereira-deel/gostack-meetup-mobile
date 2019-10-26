@@ -11,6 +11,7 @@ import Dashboard from '~/pages/Dashboard';
 import Profile from '~/pages/Profile';
 import SignIn from '~/pages/SignIn';
 import SignUp from '~/pages/SignUp';
+import Subscription from '~/pages/Subscription';
 
 const Sign = createSwitchNavigator({
   SignIn,
@@ -35,12 +36,7 @@ const headerConfig = {
 const App = createBottomTabNavigator(
   {
     Dashboard: {
-      screen: createStackNavigator(
-        {
-          Dashboard,
-        },
-        headerConfig
-      ),
+      screen: createStackNavigator({ Dashboard }, headerConfig),
       navigationOptions: {
         tabBarLabel: 'Meetups',
         tabBarIcon: ({ tintColor }) => (
@@ -48,13 +44,17 @@ const App = createBottomTabNavigator(
         ),
       },
     },
+    Subscription: {
+      screen: createStackNavigator({ Subscription }, headerConfig),
+      navigationOptions: {
+        tabBarLabel: 'Inscrições',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="local-offer" size={25} color={tintColor} />
+        ),
+      },
+    },
     Profile: {
-      screen: createStackNavigator(
-        {
-          Profile,
-        },
-        headerConfig
-      ),
+      screen: createStackNavigator({ Profile }, headerConfig),
       navigationOptions: {
         tabBarLabel: 'Meu perfil',
         tabBarIcon: ({ tintColor }) => (
