@@ -26,7 +26,7 @@ export const DateText = styled.Text`
 export const MeetupList = styled(FlatList).attrs({
   showsVerticalScrollIndicator: false,
 })`
-  margin: 0 10px;
+  margin: 0 15px;
 `;
 
 export const MeetupItem = styled.View`
@@ -82,4 +82,20 @@ export const FreeDayMessage = styled.Text`
   font-weight: bold;
   margin-top: 30px;
   opacity: 0.8;
+`;
+
+export const SubscribedLabel = styled.View`
+  height: 46px;
+  border-radius: 4px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+`;
+
+export const SubscribedLabelText = styled.Text`
+  margin-left: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #f94d6a;
 `;

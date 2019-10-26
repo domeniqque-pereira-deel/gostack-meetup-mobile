@@ -1,7 +1,7 @@
 import { format, parseISO, addDays, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import React, { useEffect, useState, useMemo } from 'react';
-import { Text } from 'react-native';
+import { Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Background from '~/components/Background';
@@ -85,6 +85,16 @@ export default function Dashboard() {
     setSelectedDate(addDays(selectedDate, 1));
   }
 
+  async function handleSubscribe(id) {
+    try {
+      await api.post(`meetups/${id}/subscriptions`);
+
+      Alert.alert('Inscrito', 'Inscrição realizada com sucesso!');
+    } catch (err) {
+      Alert.alert('Inscrição não realizada', err.response.data.error);
+    }
+  }
+
   return (
     <Background>
       <Container>
@@ -121,21 +131,23 @@ export default function Dashboard() {
                 <MeetupDetailsTitle>{item.title}</MeetupDetailsTitle>
 
                 <MeetupDetails>
-                  <Icon name="event" size={30} color="#333" />
+                  <Icon name="event" size={30} color="#999" />
                   <MeetupDetailsText>{item.dateFormated}</MeetupDetailsText>
                 </MeetupDetails>
                 <MeetupDetails>
-                  <Icon name="place" size={30} color="#333" />
+                  <Icon name="place" size={30} color="#999" />
                   <MeetupDetailsText>{item.location}</MeetupDetailsText>
                 </MeetupDetails>
                 <MeetupDetails>
-                  <Icon name="person" size={30} color="#333" />
+                  <Icon name="person" size={30} color="#999" />
                   <MeetupDetailsText>
                     Organizador: {item.organizer.name}
                   </MeetupDetailsText>
                 </MeetupDetails>
 
-                <SubscribeButton onPress={() => {}} disabled={item.finished}>
+                <SubscribeButton
+                  onPress={() => handleSubscribe(item.id)}
+                  disabled={item.finished}>
                   {item.finished ? 'Evento finalizado' : 'Realizar inscrição'}
                 </SubscribeButton>
               </MeetupItemDetailsContainer>

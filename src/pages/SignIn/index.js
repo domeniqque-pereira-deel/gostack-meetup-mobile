@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useState, useRef } from 'react';
 import { Image } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 
 import logo from '~/assets/logo.png';
@@ -23,8 +23,8 @@ export default function SignIn({ navigation }) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [errors, setErrors] = useState({});
+  const loading = useSelector(state => state.auth.loading);
 
   const schema = Yup.object().shape({
     email: Yup.string()
@@ -85,7 +85,9 @@ export default function SignIn({ navigation }) {
             error={errors.password}
           />
 
-          <SubmitButton onPress={handleSubmit}>Acessar</SubmitButton>
+          <SubmitButton onPress={handleSubmit} loading={loading}>
+            Acessar
+          </SubmitButton>
         </Form>
 
         <SignLink onPress={() => navigation.navigate('SignUp')}>
