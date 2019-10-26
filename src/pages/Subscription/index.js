@@ -1,9 +1,15 @@
+import { format, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { withNavigationFocus } from 'react-navigation';
+import { useSelector, useDispatch } from 'react-redux';
 
 import Background from '~/components/Background';
 import api from '~/services/api';
+import { loadSubscriptionsRequest } from '~/store/modules/user/actions';
 
 import {
   Container,
@@ -19,31 +25,24 @@ import {
   Empty,
 } from './styles';
 
-export default function Subscription() {
-  const [subscriptions, setSubscriptions] = useState([]);
-  const [loading, setLoading] = useState(false);
+function Subscription({ isFocused }) {
+  const subscriptions = useSelector(state => state.user.subscriptions);
+  const loading =
+    useSelector(state => state.user.loadingSubscriptions) || false;
 
-  async function loadSubscriptions() {
-    setLoading(true);
-
-    const response = await api.get('subscriptions');
-
-    const data = response.data.map(subscription => subscription.Meetup);
-
-    setSubscriptions(data);
-    setLoading(false);
-  }
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    loadSubscriptions();
-  }, []);
+    dispatch(loadSubscriptionsRequest());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocused]);
 
   async function handleUnsubscribe(id) {
     await api.delete(`/meetups/${id}/subscriptions`);
 
     Alert.alert('Inscrição cancelada', 'Inscrição cancelada com sucesso!');
 
-    loadSubscriptions();
+    dispatch(loadSubscriptionsRequest());
   }
 
   return (
@@ -57,7 +56,7 @@ export default function Subscription() {
           data={subscriptions}
           keyExtractor={item => String(item.id)}
           refreshing={loading}
-          onRefresh={loadSubscriptions}
+          onRefresh={() => dispatch(loadSubscriptionsRequest())}
           ListFooterComponent={loading && <Loading />}
           renderItem={({ item }) => (
             <MeetupItem>
@@ -97,3 +96,9 @@ export default function Subscription() {
     </Background>
   );
 }
+
+Subscription.propTypes = {
+  isFocused: PropTypes.bool.isRequired,
+};
+
+export default withNavigationFocus(Subscription);

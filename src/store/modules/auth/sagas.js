@@ -3,6 +3,7 @@ import { all, takeLatest, put, call } from 'redux-saga/effects';
 
 import api from '~/services/api';
 
+import { loadSubscriptionsRequest } from '../user/actions';
 import { signFailure, signInSuccess } from './actions';
 
 export function* signUp({ payload }) {
@@ -34,6 +35,7 @@ export function* signIn({ payload }) {
     api.defaults.headers.Authorization = `Bearer ${token}`;
 
     yield put(signInSuccess(token, user));
+    yield put(loadSubscriptionsRequest());
   } catch (err) {
     Alert.alert('Falha na autenticação', 'Verifique seus dados!');
     yield put(signFailure());

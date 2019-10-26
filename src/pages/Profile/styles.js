@@ -13,7 +13,7 @@ export const Container = styled.KeyboardAvoidingView.attrs({
   padding: 0 20px;
 `;
 
-export const Form = styled.View`
+export const Form = styled.ScrollView`
   align-self: stretch;
   margin-top: 50px;
 `;

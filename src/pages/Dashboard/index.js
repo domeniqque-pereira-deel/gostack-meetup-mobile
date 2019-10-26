@@ -1,17 +1,16 @@
-import { format, parseISO, addDays, subDays } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import React, { useEffect, useState, useMemo } from 'react';
-import { Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useSelector, useDispatch } from 'react-redux';
 
 import Background from '~/components/Background';
+import DatePicker from '~/components/DatePicker';
 import api from '~/services/api';
+import { subscribeOnMeetupRequest } from '~/store/modules/user/actions';
 
 import {
   Container,
-  DateControls,
-  DateText,
-  DateControlButton,
   MeetupList,
   MeetupItem,
   MeetupItemBanner,
@@ -21,7 +20,9 @@ import {
   MeetupDetailsText,
   SubscribeButton,
   Loading,
-  FreeDayMessage,
+  Empty,
+  SubscribedLabel,
+  SubscribedLabelText,
 } from './styles';
 
 export default function Dashboard() {
@@ -32,10 +33,9 @@ export default function Dashboard() {
   const [totalPages, setTotalPages] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const selectedDateText = useMemo(
-    () => format(selectedDate, "dd 'de' MMMM", { locale: ptBR }),
-    [selectedDate]
-  );
+  const subscriptions = useSelector(state => state.user.subscriptions);
+
+  const dispatch = useDispatch();
 
   async function loadMeetups(pageNumber = nextPage, shouldReset = false) {
     if ((totalPages && pageNumber > totalPages) || loading) return;
@@ -45,6 +45,8 @@ export default function Dashboard() {
     if (shouldReset) {
       setMeetups([]);
     }
+
+    const subscribedIds = subscriptions.map(meetup => meetup.id);
 
     const date = format(selectedDate, 'yyyy-MM-dd');
     const response = await api.get(`/meetups?date=${date}&page=${pageNumber}`);
@@ -56,6 +58,7 @@ export default function Dashboard() {
       dateFormated: format(parseISO(meetup.date), "dd 'de' MMMM', às' HH'h'", {
         locale: ptBR,
       }),
+      subscribed: subscribedIds.includes(meetup.id),
     }));
 
     setMeetups(shouldReset ? data : [...meetups, ...data]);
@@ -67,7 +70,7 @@ export default function Dashboard() {
   useEffect(() => {
     loadMeetups(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDate]);
+  }, [selectedDate, subscriptions]);
 
   async function refreshList() {
     setRefreshing(true);
@@ -77,39 +80,22 @@ export default function Dashboard() {
     setRefreshing(false);
   }
 
-  function prevDate() {
-    setSelectedDate(subDays(selectedDate, 1));
-  }
+  function handleSubscribe(meetup) {
+    if (meetup.finished) return;
 
-  function nextDate() {
-    setSelectedDate(addDays(selectedDate, 1));
-  }
-
-  async function handleSubscribe(id) {
-    try {
-      await api.post(`meetups/${id}/subscriptions`);
-
-      Alert.alert('Inscrito', 'Inscrição realizada com sucesso!');
-    } catch (err) {
-      Alert.alert('Inscrição não realizada', err.response.data.error);
-    }
+    dispatch(subscribeOnMeetupRequest(meetup));
   }
 
   return (
     <Background>
       <Container>
-        <DateControls>
-          <DateControlButton onPress={prevDate}>
-            <Icon name="keyboard-arrow-left" size={30} color="#fff" />
-          </DateControlButton>
-          <DateText>{selectedDateText}</DateText>
-          <DateControlButton onPress={nextDate}>
-            <Icon name="keyboard-arrow-right" size={30} color="#fff" />
-          </DateControlButton>
-        </DateControls>
+        <DatePicker
+          date={selectedDate}
+          onChange={(e, date) => setSelectedDate(date)}
+        />
 
         {meetups.length === 0 && !loading && (
-          <FreeDayMessage>Nenhum evento para este dia</FreeDayMessage>
+          <Empty>Nenhum evento para este dia</Empty>
         )}
 
         <MeetupList
@@ -145,11 +131,19 @@ export default function Dashboard() {
                   </MeetupDetailsText>
                 </MeetupDetails>
 
-                <SubscribeButton
-                  onPress={() => handleSubscribe(item.id)}
-                  disabled={item.finished}>
-                  {item.finished ? 'Evento finalizado' : 'Realizar inscrição'}
-                </SubscribeButton>
+                {item.subscribed ? (
+                  <SubscribedLabel>
+                    <Icon name="check" size={25} color="#f94d6a" />
+
+                    <SubscribedLabelText>Inscrito</SubscribedLabelText>
+                  </SubscribedLabel>
+                ) : (
+                  <SubscribeButton
+                    onPress={() => handleSubscribe(item)}
+                    disabled={item.finished}>
+                    {item.finished ? 'Evento finalizado' : 'Realizar inscrição'}
+                  </SubscribeButton>
+                )}
               </MeetupItemDetailsContainer>
             </MeetupItem>
           )}

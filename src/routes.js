@@ -45,7 +45,7 @@ const App = createBottomTabNavigator(
       },
     },
     Subscription: {
-      screen: createStackNavigator({ Subscription }, headerConfig),
+      screen: createStackNavigator({ Subscription }, { ...headerConfig }),
       navigationOptions: {
         tabBarLabel: 'Inscrições',
         tabBarIcon: ({ tintColor }) => (
@@ -64,8 +64,9 @@ const App = createBottomTabNavigator(
     },
   },
   {
+    resetOnBlur: true,
     tabBarOptions: {
-      // keyboardHidesTabBar: true,
+      keyboardHidesTabBar: true,
       activeTintColor: '#fff',
       inactiveTintColor: 'rgba(255, 255, 255, 0.6)',
       style: {

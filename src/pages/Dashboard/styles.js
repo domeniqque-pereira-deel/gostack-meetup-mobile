@@ -7,22 +7,6 @@ export const Container = styled.SafeAreaView`
   flex: 1;
 `;
 
-export const DateControls = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
-`;
-
-export const DateControlButton = styled.TouchableOpacity``;
-
-export const DateText = styled.Text`
-  color: #fff;
-  font-size: 23px;
-  padding: 0 20px;
-  font-weight: bold;
-`;
-
 export const MeetupList = styled(FlatList).attrs({
   showsVerticalScrollIndicator: false,
 })`
@@ -75,7 +59,7 @@ export const Loading = styled.ActivityIndicator.attrs({
   margin: 30px 0;
 `;
 
-export const FreeDayMessage = styled.Text`
+export const Empty = styled.Text`
   align-self: center;
   color: #fff;
   font-size: 14px;
