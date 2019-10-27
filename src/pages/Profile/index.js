@@ -130,7 +130,7 @@ export default function Profile() {
             secureTextEntry
             placeholder="Nova senha"
             ref={passwordRef}
-            returnKeyType="send"
+            returnKeyType="next"
             value={password}
             onChangeText={setPassword}
             onSubmitEditing={() => passwordConfirmationRef.current.focus()}
