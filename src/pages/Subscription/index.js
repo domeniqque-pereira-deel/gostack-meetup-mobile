@@ -1,7 +1,5 @@
-import { format, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import PropTypes from 'prop-types';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { withNavigationFocus } from 'react-navigation';
